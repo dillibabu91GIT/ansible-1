@@ -1,1 +1,7 @@
-
+jboss_controller: 10.15.24.33:16990
+github_token: "{{ lookup('env', 'TOKEN_GITHUB') }}"
+#war_file_url: "https://maven.pkg.github.com/Rakbank-DEH-Onboarding/SMEDigitalBank/com/rakbank/infosys/lib/smedigitalbank/1111/smedigitalbank-1111.war"
+war_file_url: "URL_NOT_SET"
+war_file_name: "{{ war_file_url | basename }}"
+jboss_home: "/apps/JBOSSEAP7.2_DIGITAL_BANK/EAP-7.2.0"
+jboss_deployments_dir: "{{ jboss_home }}/standalone/deployments"
