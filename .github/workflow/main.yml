@@ -1,42 +1,26 @@
-  - hosts: '{{ target }}'
-    become: yes
-    #become_method: sudo
-    become_user: itdevtra
-    gather_facts: yes
-    roles:
-      - smedeployment
-      ---------------------------
-      ---------------------------
+workflow
+name: Deploy WAR to JBoss
 
-      ---
-#- name: Stop JBoss
-  #become: true 
-  #become_user: itdevtra
-  #command: "/apps/JBOSSEAP7.2_DIGITAL_BANK/EAP-7.2.0/bin/jboss-cli.sh --connect controller={{ jboss_controller }} command=:shutdown"
-  #ignore_errors: yes
+on:
+  workflow_dispatch:
+    inputs:
+      version:
+        description: 'WAR Version to Deploy'
+        required: true
+        default: '1111'
 
-- name: Download WAR
-  delegate_to: localhost
-  run_once: true
-  get_url:
-    url: "{{ war_file_url }}"
-    dest: "/tmp/{{ war_file_name }}"
-    headers:
-      Authorization: "token {{ github_token }}"
+jobs:
+  deploy:
+    runs-on:
+      group: rakbank-self-hosted-runner
+      labels: dehitdevtra1
+    steps: 
+      - name: Checkout Ansible playbook
+        uses: actions/checkout@v2
 
-#- name: Copy WAR to Target Server
-  #copy:
-    #src: "/tmp/{{ war_file_name }}"
-    #dest: "{{ jboss_deployments_dir }}/{{ war_file_name }}"
-
-#- name: Start JBoss 
-  #become: true 
-  #become_user: itdevtra
-  #command: /apps/JBOSSEAP7.2_DIGITAL_BANK/EAP-7.2.0/bin/STARTJBOSSEAP7.2_DIGITAL_BANK.sh
-
-- name: Clean up WAR from Runner
-  delegate_to: localhost
-  file:
-    path: "/tmp/{{ war_file_name }}"
-    state: absent
-  run_once: true
+      - name: Run playbook
+        env:
+          TOKEN_GITHUB: ${{ secrets.TOKEN_GITHUB }}
+        run: |
+          cd ${{ github.workspace }}
+          ansible-playbook -b --extra-vars "target=target_jb war_file_url=https://maven.pkg.github.com/Rakbank-DEH-Onboarding/SMEDigitalBank/com/rakbank/infosys/lib/smedigitalbank/${{ github.event.inputs.version }}/smedigitalbank-${{ github.event.inputs.version }}.war" ./playbook/smedeployment.yml
