@@ -42,6 +42,10 @@ if [ -n "$release_content" ]; then
 
             # Print information about the backup
             echo "Backup: $app_name - $targeted_path -> $backup_path"
+            
+            # List files in the backup directory
+            echo "Backup files for $app_name:"
+            ls -la "$backup_path"
 
             # Copy new deployment files to targeted location
             cp -r "$new_deployment_path" "$targeted_path"
