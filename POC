@@ -1,0 +1,27 @@
+- name: Deploy War Files to JBoss
+  hosts: your_jboss_server
+  become: yes
+  vars:
+    github_token: "your_github_token_here"  # Replace with your GitHub token
+    war_files: "{{ lookup('env', 'GITHUB_ACTIONS_WAR_FILE') }}"  # GitHub Actions environment variable for the war file
+    jboss_user: "{{ lookup('env', 'JBoss_USER') | default('default_user') }}"  # JBoss username, default_user used if not provided
+    jboss_password: "{{ lookup('env', 'JBoss_PASSWORD') | default('default_password') }}"  # JBoss password, default_password used if not provided
+ 
+  tasks:
+    - name: Clone the GitHub repository
+      git:
+        repo: https://github.com/yourusername/yourrepository.git  # Replace with your GitHub repository URL
+        dest: /tmp/Jboss-Deploy
+        version: master
+        accept_hostkey: yes
+        extra_args: "--access-token {{ github_token }}"
+      register: git_clone_result
+ 
+    - debug:
+        var: git_clone_result
+ 
+    - name: Check for changes in the repository
+      git:
+        repo: /tmp/Jboss-Deploy
+        dest: /tmp/Jboss-Deploy
+        update: yes
