@@ -25,7 +25,7 @@ jobs:
           BRANCH: ${{ secrets.BRANCH_REPO1 }}
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
-          ansible-playbook -e "owner=$OWNER repo=$REPO branch=$BRANCH github_token=$GITHUB_TOKEN" playbook/main1.yml
+          ansible-playbook -e "owner=$OWNER repo=$REPO branch=$BRANCH github_token=$GITHUB_TOKEN" playbook/main.yml
 
   deploy-repo2:
     runs-on: ubuntu-latest
@@ -46,4 +46,4 @@ jobs:
           BRANCH: ${{ secrets.BRANCH_REPO2 }}
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
-          ansible-playbook -e "owner=$OWNER repo=$REPO branch=$BRANCH github_token=$GITHUB_TOKEN" playbook/main1.yml
+          ansible-playbook -e "owner=$OWNER repo=$REPO branch=$BRANCH github_token=$GITHUB_TOKEN" playbook/main.yml
