@@ -1,26 +1,49 @@
-workflow
-name: Deploy WAR to JBoss
+name: Deploy War Files
 
 on:
-  workflow_dispatch:
-    inputs:
-      version:
-        description: 'WAR Version to Deploy'
-        required: true
-        default: '1111'
+  push:
+    branches:
+      - main
 
 jobs:
-  deploy:
-    runs-on:
-      group: rakbank-self-hosted-runner
-      labels: dehitdevtra1
-    steps: 
-      - name: Checkout Ansible playbook
+  deploy-repo1:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
         uses: actions/checkout@v2
-
-      - name: Run playbook
+      
+      - name: Set up JDK
+        uses: actions/setup-java@v2
+        with:
+          distribution: 'adopt'
+          java-version: '11'
+      
+      - name: Run playbook for repo 1
         env:
-          TOKEN_GITHUB: ${{ secrets.TOKEN_GITHUB }}
+          OWNER: ${{ secrets.OWNER_REPO1 }}
+          REPO: ${{ secrets.REPO_REPO1 }}
+          BRANCH: ${{ secrets.BRANCH_REPO1 }}
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
-          cd ${{ github.workspace }}
-          ansible-playbook -b --extra-vars "target=target_jb war_file_url=https://maven.pkg.github.com/Rakbank-DEH-Onboarding/SMEDigitalBank/com/rakbank/infosys/lib/smedigitalbank/${{ github.event.inputs.version }}/smedigitalbank-${{ github.event.inputs.version }}.war" ./playbook/smedeployment.yml
+          ansible-playbook -e "owner=$OWNER repo=$REPO branch=$BRANCH github_token=$GITHUB_TOKEN" playbooks/main.yml
+
+  deploy-repo2:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v2
+      
+      - name: Set up JDK
+        uses: actions/setup-java@v2
+        with:
+          distribution: 'adopt'
+          java-version: '11'
+      
+      - name: Run playbook for repo 2
+        env:
+          OWNER: ${{ secrets.OWNER_REPO2 }}
+          REPO: ${{ secrets.REPO_REPO2 }}
+          BRANCH: ${{ secrets.BRANCH_REPO2 }}
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          ansible-playbook -e "owner=$OWNER repo=$REPO branch=$BRANCH github_token=$GITHUB_TOKEN" main.yml
