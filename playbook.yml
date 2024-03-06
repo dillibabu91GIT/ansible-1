@@ -1,5 +1,5 @@
 - name: Deploy War Files to JBoss
-  hosts: jboss_server
+  hosts: jboss_servers  # This should match the group name in your inventory file
   become: yes
   vars:
     github_token: "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"
