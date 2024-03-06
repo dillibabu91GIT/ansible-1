@@ -1,0 +1,49 @@
+name: Deploy War Files
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  deploy-repo1:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v2
+      
+      - name: Set up JDK
+        uses: actions/setup-java@v2
+        with:
+          distribution: 'adopt'
+          java-version: '11'
+      
+      - name: Run playbook for repo 1
+        env:
+          OWNER: ${{ secrets.OWNER_REPO1 }}
+          REPO: ${{ secrets.REPO_REPO1 }}
+          BRANCH: ${{ secrets.BRANCH_REPO1 }}
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          ansible-playbook -e "owner=$OWNER repo=$REPO branch=$BRANCH github_token=$GITHUB_TOKEN" playbook/main.yml
+
+  deploy-repo2:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v2
+      
+      - name: Set up JDK
+        uses: actions/setup-java@v2
+        with:
+          distribution: 'adopt'
+          java-version: '11'
+      
+      - name: Run playbook for repo 2
+        env:
+          OWNER: ${{ secrets.OWNER_REPO2 }}
+          REPO: ${{ secrets.REPO_REPO2 }}
+          BRANCH: ${{ secrets.BRANCH_REPO2 }}
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          ansible-playbook -e "owner=$OWNER repo=$REPO branch=$BRANCH github_token=$GITHUB_TOKEN" playbook/main.yml
