@@ -1,13 +1,21 @@
 - name: Deploy War Files to JBoss
-  hosts: all
+  hosts: jboss_server
   become: yes
+  vars:
+    github_token: "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"
+    owner: "dillibabu91GIT"
+    repo: "jboss-deploy"
+    branch: "master"
+    jboss_user: "demo"  # JBoss username
+    jboss_password: "test123"  # JBoss password
+
   tasks:
     - name: Get list of .war files in the GitHub repository
       uri:
-        url: "https://api.github.com/repos/dillibabu91GIT/jboss-deploy/contents?ref=master"
+        url: "https://api.github.com/repos/{{ owner }}/{{ repo }}/contents?ref={{ branch }}"
         method: GET
         headers:
-          Authorization: "token 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"
+          Authorization: "token {{ github_token }}"
       register: github_response
 
     - name: Download .war files from GitHub repository
@@ -15,7 +23,7 @@
         url: "{{ item.download_url }}"
         dest: "/tmp/{{ item.name }}"
         headers:
-          Authorization: "token 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"
+          Authorization: "token {{ github_token }}"
       loop: "{{ github_response.json | selectattr('name', 'match', '.*\\.war$') | list }}"
 
     - name: Copy .war files to JBoss deployment directory
