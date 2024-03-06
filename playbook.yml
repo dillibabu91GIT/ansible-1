@@ -1,0 +1,29 @@
+name: Deploy War Files
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout repository
+      uses: actions/checkout@v2
+      
+    - name: Set up Python
+      uses: actions/setup-python@v2
+      with:
+        python-version: '3.x'
+      
+    - name: Install Ansible
+      run: |
+        pip install ansible
+      
+    - name: Run Ansible playbook
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      run: |
+        ansible-playbook -e "github_token=${{ secrets.GITHUB_TOKEN }}" playbook.yml
