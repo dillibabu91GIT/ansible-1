@@ -1,24 +1,13 @@
----
 - name: Deploy War Files to JBoss
-  hosts: localhost
+  hosts: all
   become: yes
-  gather_facts: false
-
-  vars:
-    github_token: "{{ github_token }}"
-    owner: "{{ owner }}"
-    repo: "{{ repo }}"
-    branch: "{{ branch }}"
-    jboss_user: "{{ jboss_user }}"
-    jboss_password: "{{ jboss_password }}"
-
   tasks:
     - name: Get list of .war files in the GitHub repository
       uri:
-        url: "https://api.github.com/repos/{{ owner }}/{{ repo }}/contents?ref={{ branch }}"
+        url: "https://api.github.com/repos/dillibabu91GIT/jboss-deploy/contents?ref=master"
         method: GET
         headers:
-          Authorization: "token {{ github_token }}"
+          Authorization: "token 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"
       register: github_response
 
     - name: Download .war files from GitHub repository
@@ -26,17 +15,17 @@
         url: "{{ item.download_url }}"
         dest: "/tmp/{{ item.name }}"
         headers:
-          Authorization: "token {{ github_token }}"
+          Authorization: "token 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"
       loop: "{{ github_response.json | selectattr('name', 'match', '.*\\.war$') | list }}"
 
     - name: Copy .war files to JBoss deployment directory
       ansible.builtin.copy:
         src: "/tmp/{{ item.name }}"
         dest: "/opt/wildfly/standalone/deployments/"
-        owner: "{{ jboss_user }}"
-        group: "{{ jboss_user }}"
+        owner: "wildfly"
+        group: "wildfly"
         mode: '0777'
-        remote_src: yes
+        remote_src: yes  # Copy from Ansible controller
       loop: "{{ github_response.json | selectattr('name', 'match', '.*\\.war$') | list }}"
 
     - name: Reload JBoss to deploy changes
