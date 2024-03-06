@@ -1,5 +1,5 @@
 - name: Deploy War Files
-  hosts: jboss_servers
+  hosts: 3.109.5.198
   tasks:
     - name: Get list of .war files in the GitHub repository
       uri:
