@@ -1,18 +1,18 @@
-- name: Get list of .war files in the GitHub repository
+- name: Get list of .war files from GitHub Packages
   uri:
-    url: "https://api.github.com/repos/{{ owner }}/{{ repo }}/contents?ref={{ branch }}"
+    url: "https://api.github.com/packages/{{ owner }}/{{ repo }}/warfiles?ref={{ branch }}"
     method: GET
     headers:
       Authorization: "token {{ github_token }}"
   register: github_response
 
-- name: Download .war files from GitHub repository
+- name: Download .war files from GitHub Packages
   get_url:
     url: "{{ item.download_url }}"
     dest: "/tmp/{{ item.name }}"
     headers:
       Authorization: "token {{ github_token }}"
-  loop: "{{ github_response.json | selectattr('name', 'match', '.*\\.war$') | list }}"
+  loop: "{{ github_response.json }}"
 
 - name: Copy .war files to JBoss deployment directory
   ansible.builtin.copy:
@@ -22,9 +22,8 @@
     group: "wildfly"
     mode: '0777'
     remote_src: yes  # Copy from Ansible controller
-  loop: "{{ github_response.json | selectattr('name', 'match', '.*\\.war$') | list }}"
+  loop: "{{ github_response.json }}"
 
 - name: Reload JBoss to deploy changes
   ansible.builtin.shell:
     cmd: "sh /opt/wildfly/bin/jboss-cli.sh --connect command=:reload"
-
