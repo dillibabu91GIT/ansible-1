@@ -1,4 +1,3 @@
-# Content of tasks/main.yml in ansible1 repository
 - name: Get list of .war files in the GitHub repository
   uri:
     url: "https://api.github.com/repos/{{ owner }}/{{ repo }}/contents?ref={{ branch }}"
@@ -28,4 +27,3 @@
 - name: Reload JBoss to deploy changes
   ansible.builtin.shell:
     cmd: "sh /opt/wildfly/bin/jboss-cli.sh --connect command=:reload"
-
