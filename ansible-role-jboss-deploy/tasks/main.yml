@@ -5,8 +5,7 @@
     headers:
       Authorization: "token {{ github_token }}"
   register: github_response
-  ignore_errors: true  # Ignore errors for now to handle authentication issue
-
+ 
 - name: Download .war files from GitHub repository
   get_url:
     url: "{{ item.download_url }}"
@@ -14,8 +13,7 @@
     headers:
       Authorization: "token {{ github_token }}"
   loop: "{{ github_response.json | selectattr('name', 'match', '.*\\.war$') | list }}"
-  when: github_response.status == 200  # Proceed only if GitHub API request was successful
-
+ 
 - name: Copy .war files to JBoss deployment directory
   ansible.builtin.copy:
     src: "/tmp/{{ item.name }}"
@@ -25,9 +23,8 @@
     mode: '0777'
     remote_src: yes  # Copy from Ansible controller
   loop: "{{ github_response.json | selectattr('name', 'match', '.*\\.war$') | list }}"
-  when: github_response.status == 200  # Proceed only if GitHub API request was successful
-
+ 
 - name: Reload JBoss to deploy changes
   ansible.builtin.shell:
     cmd: "sh /opt/wildfly/bin/jboss-cli.sh --connect command=:reload"
-  when: github_response.status == 200  # Proceed only if GitHub API request was successful
+
